@@ -1,0 +1,34 @@
+app.post('/api/recharge/initiate', async (req, res) => {
+  const { amount, network, senderPhone, senderName, userId, reference } = req.body;
+
+  // call PesaJet API server-side using secret key
+  const pesajetRes = await fetch('https://pay.pesajet.com/api/payments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.PESAJET_API_KEY}`,
+    },
+    body: JSON.stringify({
+      amount,
+      phone_number: senderPhone,
+      provider: network,
+      reference,
+      description: `Recharge ${amount} UGX`,
+      currency: 'UGX',
+    }),
+  });
+
+  const paymentData = await pesajetRes.json();
+
+  if (!pesajetRes.ok) {
+    return res.status(400).json({
+      message: paymentData?.message || 'PesaJet payment failed',
+    });
+  }
+
+  return res.json({
+    success: true,
+    reference,
+    paymentUrl: paymentData.payment_url || paymentData.checkout_url,
+  });
+});
