@@ -38,7 +38,7 @@ const Regulation = () => {
         <div className="flex items-center gap-3 mb-3">
           <span className="text-3xl">📱</span>
           <div>
-            <h2 className="font-bold text-lg">Samsung Earnings</h2>
+            <h2 className="font-bold text-lg">huawei Earnings</h2>
             <p className="text-blue-200 text-xs">Invest Smart, Earn Daily</p>
           </div>
         </div>
@@ -123,16 +123,16 @@ const Regulation = () => {
           <h3 className="font-bold text-gray-800 text-base mb-4">Platform Rules</h3>
           <div className="space-y-3">
             {[
-              { num: '1', text: 'Invest UGX 15,000, withdraw UGX 7,000 immediately.' },
-              { num: '2', text: 'Registration reward: UGX 7,000 credited to new accounts.' },
-              { num: '3', text: 'Daily check-in reward: UGX 100 per day.' },
+              { num: '1', text: 'Invest UGX 25,000, withdraw UGX 9,000 immediately.' },
+              { num: '2', text: 'Registration reward: UGX 9,000 credited to new accounts.' },
+              { num: '3', text: 'Daily check-in reward: UGX 300 per day.' },
               { num: '4', text: 'Daily return rate: varies by package group (20%–30%).' },
               {
                 num: '5',
-                text: 'Invite friends to invest and immediately earn 30% cash commission. L2 earns 2%, L3 earns 1%.',
+                text: 'Invite friends to invest and immediately earn 27% cash commission. L2 earns 2%, L3 earns 1%.',
               },
               { num: '6', text: 'Product income is automatically deposited daily, 24/7, and can be withdrawn at any time.' },
-              { num: '7', text: 'Minimum withdrawal: UGX 7,000. Tax: 18%. Max 2 withdrawals per day.' },
+              { num: '7', text: 'Minimum withdrawal: UGX 9,000. Tax: 18%. Max 2 withdrawals per day.' },
               { num: '8', text: 'Balance is only deducted after admin approves your withdrawal request.' },
               {
                 num: '9',
@@ -166,7 +166,7 @@ const Regulation = () => {
           </div>
           <div className="divide-y divide-gray-100">
             {[
-              { level: 'L1 — Direct Referral', rate: '30%', desc: 'Friend you invite signs up and invests', color: 'text-amber-600 bg-amber-50' },
+              { level: 'L1 — Direct Referral', rate: '27%', desc: 'Friend you invite signs up and invests', color: 'text-amber-600 bg-amber-50' },
               { level: 'L2 — Second Level', rate: '2%', desc: 'When your L1 referrals invite others who invest', color: 'text-purple-600 bg-purple-50' },
               { level: 'L3 — Third Level', rate: '1%', desc: 'When your L2 members invite others who invest', color: 'text-teal-600 bg-teal-50' },
             ].map(({ level, rate, desc, color }) => (
