@@ -59,8 +59,8 @@ export function isToday(dateStr: string): boolean {
 export function getReferralLink(code: string): string {
   const origin = typeof window !== 'undefined'
     ? window.location.origin
-    : 'https://samsungearnings.onspace.app';
-  // import.meta.env.BASE_URL includes the trailing slash (e.g. '/SamsungEarnings-investing-uganda-256/')
+    : 'https://huaweiearnings.onspace.app';
+  // import.meta.env.BASE_URL includes the trailing slash (e.g. '/huaweiEarnings-investing-uganda-256/')
   const basePath = import.meta.env.BASE_URL ?? '/';
   return `${origin}${basePath}register?ref=${code}`;
 }
