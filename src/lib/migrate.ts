@@ -112,7 +112,7 @@ export async function runMigration(
     daily_earnings: u.dailyEarnings ?? 0,
     referral_earnings: u.referralEarnings ?? 0,
     total_withdrawal: u.totalWithdrawal ?? 0,
-    registration_bonus: u.registrationBonus ?? 7000,
+    registration_bonus: u.registrationBonus ?? 9000,
     referral_code: u.referralCode,
     referred_by: u.referredBy ?? null,
     frozen: u.frozen ?? false,
