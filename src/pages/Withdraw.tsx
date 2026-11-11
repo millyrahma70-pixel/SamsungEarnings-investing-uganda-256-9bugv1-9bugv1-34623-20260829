@@ -118,16 +118,16 @@ const Withdraw = () => {
         {(!hasRecharge || !hasProduct) && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
             <div className="text-red-700 font-bold text-sm mb-2">⚠️ Withdrawal Not Available Yet</div>
-            <p className="text-red-600 text-sm mb-3">To withdraw, you must first recharge your account and purchase a Samsung investment package.</p>
+            <p className="text-red-600 text-sm mb-3">To withdraw, you must first recharge your account and purchase a huawei investment package.</p>
             <div className="space-y-2">
               <div className={`flex items-center gap-2 text-sm font-medium ${hasRecharge ? 'text-green-600' : 'text-red-500'}`}>
                 <span>{hasRecharge ? '✅' : '❌'}</span>
-                <span>Recharge account (min UGX 15,000)</span>
+                <span>Recharge account (min UGX 25,000)</span>
                 {!hasRecharge && <button onClick={() => navigate('/recharge')} className="ml-auto bg-blue-600 text-white text-xs px-3 py-1 rounded-lg font-semibold">Recharge</button>}
               </div>
               <div className={`flex items-center gap-2 text-sm font-medium ${hasProduct ? 'text-green-600' : 'text-red-500'}`}>
                 <span>{hasProduct ? '✅' : '❌'}</span>
-                <span>Buy a Samsung investment package</span>
+                <span>Buy a huawei investment package</span>
                 {!hasProduct && <button onClick={() => navigate('/product')} className="ml-auto bg-blue-600 text-white text-xs px-3 py-1 rounded-lg font-semibold">Buy Now</button>}
               </div>
             </div>
