@@ -659,11 +659,11 @@ export async function runDailyIncomeWithStats(): Promise<{
       await updateProduct({
         ...product,
         lastIncomeDate: now.toISOString(),
-      totalIncomeEarned: product.totalIncomeEarned + product.dailyIncome,
+        totalIncomeEarned: product.totalIncomeEarned + product.dailyIncome,
       });
 
-      await ({
-       addNotification userId: product.userId,
+      await addNotification({
+        userId: product.userId,
         type: 'daily_income',
         title: 'Daily Income Received',
         message: `You earned UGX ${product.dailyIncome.toLocaleString()} from ${product.packageName}`,
@@ -725,4 +725,4 @@ export async function processDailyIncome(): Promise<void> {
       });
     }
   }
-          }
+                 }
