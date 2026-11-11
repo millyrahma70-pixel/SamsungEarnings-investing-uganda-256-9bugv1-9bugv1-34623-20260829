@@ -13,25 +13,25 @@ const NotifyModal = ({ onClose }: NotifyModalProps) => {
         {/* Header */}
         <div className="relative py-6 text-center" style={{ background: 'linear-gradient(135deg, #1a1a4e, #1d4ed8)' }}>
           <div className="text-white text-4xl font-black tracking-widest">NOTIFY</div>
-          <div className="text-blue-300 text-sm mt-1">Samsung Earnings — Uganda</div>
+          <div className="text-blue-300 text-sm mt-1">Huawei Mobile earnings— Uganda</div>
         </div>
 
         {/* Content */}
         <div className="bg-white px-5 py-4 space-y-2.5">
           <p className="text-gray-800 text-sm leading-relaxed">
-            📱 Samsung Earnings officially launched in Uganda!
+            📱 huawei Earnings officially launched in Uganda!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
-            💰 Invest UGX 15,000 and withdraw UGX 7,000 instantly!
+            💰 Invest UGX 20,000 and withdraw UGX 9,000 instantly!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
-            🎁 Register now and receive UGX 7,000 bonus!
+            🎁 Register now and receive UGX 9,000 bonus!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
-            📅 Daily check-in rewards UGX 100!
+            📅 Daily check-in rewards UGX 300!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
-            👥 Invite friends to invest and earn 30% commission!
+            👥 Invite friends to invest and earn 27% commission!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
             ⚡ Earnings distributed 24/7, withdraw anytime!
