@@ -28,9 +28,9 @@ const AboutUs = () => {
         <div className="w-20 h-20 rounded-3xl bg-white/20 flex items-center justify-center mx-auto mb-4 border border-white/30">
           <span className="text-4xl">📱</span>
         </div>
-        <h2 className="text-2xl font-bold mb-2">Samsung Earnings</h2>
+        <h2 className="text-2xl font-bold mb-2">huawei Earnings</h2>
         <p className="text-blue-200 text-sm leading-relaxed max-w-xs mx-auto">
-          Uganda's most trusted Samsung investment platform — earn daily returns with premium Galaxy packages.
+          Uganda's most trusted Huawei investment platform — earn daily returns with premium Huawei mobile packages.
         </p>
         <div className="flex items-center justify-center gap-1 mt-3">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -51,8 +51,8 @@ const AboutUs = () => {
             <h3 className="font-bold text-gray-800 text-base">Our Mission</h3>
           </div>
           <p className="text-gray-600 text-sm leading-relaxed">
-            Samsung Earnings was founded with a single mission: to make passive income accessible to every Ugandan.
-            We connect everyday people with high-quality Samsung investment packages that generate consistent daily returns,
+            huawei Earnings was founded with a single mission: to make passive income accessible to every Ugandan.
+            We connect everyday people with high-quality huawei investment packages that generate consistent daily returns,
             so you can build wealth without needing financial expertise.
           </p>
         </div>
@@ -94,12 +94,12 @@ const AboutUs = () => {
           </div>
           <div className="space-y-3">
             {[
-              { icon: '🎁', title: 'Registration Bonus', desc: 'New members receive UGX 7,000 instantly upon registration.' },
+              { icon: '🎁', title: 'Registration Bonus', desc: 'New members receive UGX 9,000 instantly upon registration.' },
               { icon: '💸', title: 'Daily Auto-Earnings', desc: 'Your package income is credited automatically every 24 hours.' },
-              { icon: '⚡', title: 'Instant Referral Pay', desc: 'Earn 30% commission the moment your referral invests.' },
+              { icon: '⚡', title: 'Instant Referral Pay', desc: 'Earn 27% commission the moment your referral invests.' },
               { icon: '🔒', title: 'Secure Platform', desc: 'Strict 1-account-per-person policy to protect all members.' },
               { icon: '📲', title: 'Mobile Money', desc: 'Full MTN MoMo & Airtel Money support for Uganda.' },
-              { icon: '📅', title: 'Daily Check-In', desc: 'Earn extra UGX 100 every day just for logging in.' },
+              { icon: '📅', title: 'Daily Check-In', desc: 'Earn extra UGX 300 every day just for logging in.' },
             ].map(({ icon, title, desc }) => (
               <div key={title} className="flex items-start gap-3">
                 <span className="text-xl shrink-0 mt-0.5">{icon}</span>
@@ -122,12 +122,12 @@ const AboutUs = () => {
           </div>
           <div className="space-y-3">
             {[
-              { step: '1', text: 'Register with your phone number and get UGX 7,000 bonus.' },
+              { step: '1', text: 'Register with your phone number and get UGX 9,000 bonus.' },
               { step: '2', text: 'Recharge your account using MTN MoMo or Airtel Money.' },
               { step: '3', text: 'Purchase any Samsung Galaxy investment package of your choice.' },
               { step: '4', text: 'Earn daily income automatically — deposited every 24 hours.' },
-              { step: '5', text: 'Invite friends and earn 30% of their investment instantly.' },
-              { step: '6', text: 'Withdraw anytime — minimum UGX 7,000, processed within 24hrs.' },
+              { step: '5', text: 'Invite friends and earn 27% of their investment instantly.' },
+              { step: '6', text: 'Withdraw anytime — minimum UGX 9,000, processed within 24hrs.' },
             ].map(({ step, text }) => (
               <div key={step} className="flex items-start gap-3">
                 <div
@@ -187,7 +187,7 @@ const AboutUs = () => {
         <div className="bg-gray-100 rounded-2xl p-4 text-center">
           <p className="text-gray-500 text-xs leading-relaxed">
             Samsung Earnings is an independent investment platform operating in Uganda.
-            The Samsung Galaxy branding is used to represent investment tiers only.
+            The huawei mobile branding is used to represent investment tiers only.
             All investments carry risk. Only invest what you can afford.
           </p>
         </div>
