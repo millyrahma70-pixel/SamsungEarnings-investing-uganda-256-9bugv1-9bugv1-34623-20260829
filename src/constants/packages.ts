@@ -22,13 +22,13 @@ export const PACKAGES: InvestmentPackage[] = [
     image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80',
   },
   {
-    id: 'galaxy-a25',
-    name: 'Galaxy A25',
+    id: 'p30 pro',
+    name: 'P30 pro',
     group: 2,
     price: 50000,
     dailyIncome: 12500,
     duration: 180,
-    phone: 'Samsung Galaxy A25',
+    phone: 'huawei p30 pro',
     image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80',
   },
   {
