@@ -2,8 +2,8 @@ import { supabase } from '@/lib/supabase';
 import { User, UserProduct, Withdrawal, Recharge, Wallet, RedeemCode, Notification } from '@/types';
 
 // ─── Current User Session (localStorage only — per device session) ────────────
-const SESSION_KEY = 'samsang_current_user';
-const ADMIN_SESSION_KEY = 'huawei mobile earning_admin_session';
+const SESSION_KEY = 'huawei_current_user';
+const ADMIN_SESSION_KEY = 'Huawei mobile earning_admin_session';
 
 export const getCurrentUser = (): User | null => {
   try {
@@ -277,7 +277,7 @@ export async function getUserWithdrawals(userId: string): Promise<Withdrawal[]> 
 }
 
 export async function createWithdrawal(w: Withdrawal): Promise<void> {
-  await supabase.from('huawwi_withdrawals').insert({
+  await supabase.from('huawei_withdrawals').insert({
     id: w.id,
     user_id: w.userId,
     user_name: w.userName,
@@ -305,7 +305,7 @@ export async function getRecharges(): Promise<Recharge[]> {
 }
 
 export async function getUserRecharges(userId: string): Promise<Recharge[]> {
-  const { data } = await supabase.from('samsung_recharges').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+  const { data } = await supabase.from('huawei_recharges').select('*').eq('user_id', userId).order('created_at', { ascending: false });
   return (data ?? []).map(r => dbToRecharge(r as Record<string, unknown>));
 }
 
