@@ -73,7 +73,7 @@ const Recharge = () => {
       {step === 1 && (
         <div className="px-4 py-5 space-y-4">
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-            <p className="text-amber-700 text-sm font-medium">📌 Minimum Deposit: UGX 15,000</p>
+            <p className="text-amber-700 text-sm font-medium">📌 Minimum Deposit: UGX 25,000</p>
             <p className="text-amber-600 text-xs mt-1">Your money will be credited after admin approval.</p>
           </div>
           <div>
