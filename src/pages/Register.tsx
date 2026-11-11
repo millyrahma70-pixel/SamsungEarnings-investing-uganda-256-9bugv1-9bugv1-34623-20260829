@@ -82,7 +82,7 @@ const Register = () => {
       userId: newUser.id,
       type: 'referral_bonus',
       title: 'Welcome Bonus!',
-      message: 'Welcome to Samsung Earnings! You have received UGX 9,000 registration bonus.',
+      message: 'Welcome to huawei Earnings! You have received UGX 9,000 registration bonus.',
       isRead: false,
     });
 
