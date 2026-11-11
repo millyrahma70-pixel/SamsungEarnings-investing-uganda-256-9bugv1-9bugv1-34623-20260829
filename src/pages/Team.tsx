@@ -336,7 +336,7 @@ const Team = () => {
             </div>
             <div className="bg-amber-50 border border-amber-100 rounded-2xl p-3 text-center">
               <div className="text-amber-600 font-bold text-sm">{formatUGX(l1Earned)}</div>
-              <div className="text-gray-500 text-[10px] mt-0.5">L1 (30%)</div>
+              <div className="text-gray-500 text-[10px] mt-0.5">L1 (27%)</div>
             </div>
             <div className="bg-purple-50 border border-purple-100 rounded-2xl p-3 text-center">
               <div className="text-purple-600 font-bold text-sm">{formatUGX(l2l3Earned)}</div>
