@@ -47,7 +47,7 @@ function dbToUser(r: Record<string, unknown>): User {
     dailyEarnings: Number(r.daily_earnings),
     referralEarnings: Number(r.referral_earnings),
     totalWithdrawal: Number(r.total_withdrawal),
-    registrationBonus: Number(r.registration_bonus ?? 7000),
+    registrationBonus: Number(r.registration_bonus ?? 9000),
     referralCode: r.referral_code as string,
     referredBy: (r.referred_by as string | null) ?? null,
     frozen: Boolean(r.frozen),
