@@ -1,4 +1,4 @@
-name: Deploy SamsungEarnings-investing-uganda to GitHub Pages
+name: Deploy huawei mobile Earnings-investing-uganda to GitHub Pages
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "infnix-mobile-pages"
+  group: "huawei-mobile-pages"
   cancel-in-progress: false
 
 jobs:
