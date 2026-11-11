@@ -72,7 +72,7 @@ const Team = () => {
 
       const entries: CommissionEntry[] = [];
 
-      // L1 commissions (30%)
+      // L1 commissions (27%)
       for (const member of l1Users) {
         const memberProds = approvedProducts.filter((p) => p.userId === member.id);
         for (const prod of memberProds) {
@@ -81,7 +81,7 @@ const Team = () => {
             inviteePhone: member.phone,
             packageName: prod.packageName,
             packagePrice: prod.packagePrice,
-            commissionAmount: Math.round(prod.packagePrice * 0.30),
+            commissionAmount: Math.round(prod.packagePrice * 0.27),
             level: 1,
             date: prod.buyDate,
           });
@@ -138,17 +138,17 @@ const Team = () => {
   const copyLink = () => { navigator.clipboard.writeText(refLink); toast.success('Referral link copied!'); };
 
   const shareWhatsApp = () => {
-    const msg = `Join Samsung Earnings and earn daily! Use my referral code: ${user.referralCode}\n\nRegister here: ${refLink}\n\n🎁 Get UGX 7,000 registration bonus!`;
+    const msg = `Join huawei Earnings and earn daily! Use my referral code: ${user.referralCode}\n\nRegister here: ${refLink}\n\n🎁 Get UGX 9,000 registration bonus!`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const shareTelegram = () => {
-    const msg = `🚀 Join Samsung Earnings — Uganda's top investment platform!\n\n💰 Earn daily income from Samsung packages\n🎁 Get UGX 7,000 registration bonus\n👥 Earn 30% commission on referrals\n\nUse my referral code: *${user.referralCode}*\n\nRegister here: ${refLink}`;
+    const msg = `🚀 Join huawei Earnings — Uganda's top investment platform!\n\n💰 Earn daily income from Samsung packages\n🎁 Get UGX 9,000 registration bonus\n👥 Earn 27% commission on referrals\n\nUse my referral code: *${user.referralCode}*\n\nRegister here: ${refLink}`;
     window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const levelStats = [
-    { level: 1, commission: '30%', data: teamData.l1, color: '#d97706', bg: '#fef3c7' },
+    { level: 1, commission: '27%', data: teamData.l1, color: '#d97706', bg: '#fef3c7' },
     { level: 2, commission: '2%', data: teamData.l2, color: '#7c3aed', bg: '#ede9fe' },
     { level: 3, commission: '1%', data: teamData.l3, color: '#0f766e', bg: '#ccfbf1' },
   ];
