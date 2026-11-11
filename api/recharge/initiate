@@ -1,34 +1,42 @@
 app.post('/api/recharge/initiate', async (req, res) => {
-  const { amount, network, senderPhone, senderName, userId, reference } = req.body;
+  const { amount, network, senderPhone, reference } = req.body;
 
-  // call PesaJet API server-side using secret key
-  const pesajetRes = await fetch('https://pay.pesajet.com/api/payments', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.PESAJET_API_KEY}`,
-    },
-    body: JSON.stringify({
-      amount,
-      phone_number: senderPhone,
-      provider: network,
-      reference,
-      description: `Recharge ${amount} UGX`,
-      currency: 'UGX',
-    }),
-  });
-
-  const paymentData = await pesajetRes.json();
-
-  if (!pesajetRes.ok) {
-    return res.status(400).json({
-      message: paymentData?.message || 'PesaJet payment failed',
-    });
+  if (!amount || !senderPhone || !reference || !['mtn', 'airtel'].includes(network)) {
+    return res.status(400).json({ message: 'Invalid recharge details.' });
   }
 
-  return res.json({
-    success: true,
-    reference,
-    paymentUrl: paymentData.payment_url || paymentData.checkout_url,
-  });
+  try {
+    const pesajetRes = await fetch('https://payments.pesajet.com/api/v1/payments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.PESAJET_API_KEY}`,
+      },
+      body: JSON.stringify({
+        amount: Number(amount),
+        phone_number: senderPhone,
+        provider: network,
+        reference,
+        description: `Recharge ${amount} UGX`,
+        currency: 'UGX',
+      }),
+    });
+
+    const paymentData = await pesajetRes.json();
+
+    if (!pesajetRes.ok) {
+      return res.status(400).json({
+        message: paymentData?.message || 'PesaJet payment failed.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      reference,
+      paymentUrl: paymentData.payment_url || paymentData.checkout_url || null,
+    });
+  } catch (error) {
+    console.error('PesaJet request failed:', error);
+    return res.status(500).json({ message: 'Could not start the payment.' });
+  }
 });
