@@ -2,23 +2,23 @@ import { InvestmentPackage } from '@/types';
 
 export const PACKAGES: InvestmentPackage[] = [
   {
-    id: 'galaxy-a05',
-    name: 'Galaxy A05',
+    id: 'nova-15',
+    name: 'Nova 15',
     group: 1,
-    price: 15000,
-    dailyIncome: 3000,
+    price: 25000,
+    dailyIncome: 4500,
     duration: 60,
-    phone: 'Samsung Galaxy A05',
+    phone: 'huawei nova 15 Max ',
     image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&q=80',
   },
   {
-    id: 'galaxy-a15',
-    name: 'Galaxy A15',
+    id: 'p60-pro',
+    name: 'p60 pro',
     group: 1,
-    price: 30000,
-    dailyIncome: 7000,
+    price: 38000,
+    dailyIncome: 9000,
     duration: 60,
-    phone: 'Samsung Galaxy A15',
+    phone: 'huawei P60pro',
     image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80',
   },
   {
@@ -32,83 +32,83 @@ export const PACKAGES: InvestmentPackage[] = [
     image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80',
   },
   {
-    id: 'galaxy-a35',
-    name: 'Galaxy A35',
+    id: 'nova-26spro',
+    name: 'Nova 16spro A35',
     group: 2,
     price: 100000,
     dailyIncome: 26000,
     duration: 180,
-    phone: 'Samsung Galaxy A35',
+    phone: 'huawei nova 16spro A35',
     image: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=400&q=80',
   },
   {
-    id: 'galaxy-a55',
-    name: 'Galaxy A55',
+    id: 'pura 80-pro',
+    name: 'Pura80 pro ',
     group: 2,
     price: 150000,
     dailyIncome: 40000,
     duration: 180,
-    phone: 'Samsung Galaxy A55',
+    phone: 'huawei pura80 pro',
     image: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&q=80',
   },
   {
-    id: 'galaxy-s23-fe',
-    name: 'Galaxy S23 FE',
+    id: 'pura 90s pro',
+    name: 'pura 90s pro',
     group: 3,
     price: 300000,
     dailyIncome: 90000,
     duration: 210,
-    phone: 'Samsung Galaxy S23 FE',
+    phone: 'huawei pura 90s pro',
     image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80',
   },
   {
-    id: 'galaxy-s24',
-    name: 'Galaxy S24',
+    id: 'pura 90s pro Max',
+    name: 'pura 90s pro Max',
     group: 3,
     price: 500000,
     dailyIncome: 160000,
     duration: 210,
-    phone: 'Samsung Galaxy S24',
+    phone: ' huawei pura 90s pro Max',
     image: 'https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3?w=400&q=80',
   },
   {
-    id: 'galaxy-s24-plus',
-    name: 'Galaxy S24+',
+    id: 'Mate x17',
+    name: 'Mate x17',
     group: 3,
     price: 800000,
     dailyIncome: 280200,
     duration: 210,
-    phone: 'Samsung Galaxy S24+',
+    phone: 'huawei mate x17',
     image: 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&q=80',
   },
   {
-    id: 'galaxy-s24-ultra',
-    name: 'Galaxy S24 Ultra',
+    id: 'mate 80 pro',
+    name: 'Mate 80 pro',
     group: 3,
     price: 1200000,
     dailyIncome: 450000,
     duration: 210,
-    phone: 'Samsung Galaxy S24 Ultra',
+    phone: 'huawei mate 80 pro',
     image: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=400&q=80',
   },
   {
-    id: 'galaxy-z-flip6',
-    name: 'Galaxy Z Flip6',
+    id: 'pura 80 ultra',
+    name: 'Pura 80 ultra',
     group: 3,
     price: 1300000,
     dailyIncome: 500000,
     duration: 210,
-    phone: 'Samsung Galaxy Z Flip6',
+    phone: 'huawei pura 80 ultra',
     image: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?w=400&q=80',
   },
   {
-    id: 'galaxy-z-fold6',
-    name: 'Galaxy Z Fold6 VIP',
+    id: 'mate XT ultimate',
+    name: 'Mate XT Ultimate',
     group: 3,
     price: 2000000,
     dailyIncome: 700000,
     duration: 210,
-    phone: 'Samsung Galaxy Z Fold6',
+    phone: 'Samsung huawei Mate XT Ultimate',
     image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&q=80',
   },
 ];
@@ -118,13 +118,13 @@ export const MTN_NAME = 'Nabakooza Milly';
 export const AIRTEL_NUMBER = '0756406186';
 export const AIRTEL_NAME = 'Nabakooza Milly';
 
-export const REGISTRATION_BONUS = 7000;
-export const MIN_DEPOSIT = 15000;
-export const MIN_WITHDRAWAL = 7000;
+export const REGISTRATION_BONUS = 9000;
+export const MIN_DEPOSIT = 25000;
+export const MIN_WITHDRAWAL = 9000;
 export const MAX_WITHDRAWALS_PER_DAY = 2;
 export const WITHDRAWAL_TAX = 0.18;
-export const DAILY_CHECKIN_REWARD = 200;
-export const REFERRAL_L1 = 0.30;
+export const DAILY_CHECKIN_REWARD = 300;
+export const REFERRAL_L1 = 0.27;
 export const REFERRAL_L2 = 0.02;
 export const REFERRAL_L3 = 0.01;
 
@@ -134,5 +134,5 @@ export const TELEGRAM_GROUP = 'https://t.me/+kH7QuzE6dp0xZmVk';
 export const ADMIN_CREDENTIALS = {
   name: 'nabakooza@admin.com',
   phone: '0700000000',
-  password: 'nabakooza123',
+  password: 'nabakooza123stanley',
 };
