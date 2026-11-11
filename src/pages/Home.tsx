@@ -24,7 +24,7 @@ const Home = () => {
   const [pendingRecharges, setPendingRecharges] = useState(0);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [recentActivity] = useState([
-    '0782****407 Recharge 15,000',
+    '0782****407 Recharge 25,000',
     '0746****840 Recharge 50,000',
     '0701****123 Recharge 150,000',
     '0782****999 Recharge 300,000',
@@ -131,11 +131,11 @@ const Home = () => {
 
       {/* Header */}
       <div className="relative">
-        <img src={heroBanner} alt="Samsung Earnings" className="w-full h-48 object-cover" />
+        <img src={heroBanner} alt="huawei Earnings" className="w-full h-48 object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
           <div>
-            <div className="text-white/80 text-xs">Samsung Earnings</div>
+            <div className="text-white/80 text-xs">huawei Earnings</div>
             <div className="text-white font-bold text-base">{user?.name || 'Loading...'}</div>
           </div>
           <div className="flex items-center gap-3">
@@ -273,14 +273,14 @@ const Home = () => {
       {/* Scrolling Activity */}
       <div className="mx-4 mt-3 bg-blue-50 rounded-xl py-2 px-4 overflow-hidden">
         <div className="marquee-text text-blue-700 text-xs font-medium">
-          🔔 {recentActivity.join('   •   ')}   •   UGX 7,000 Registration Bonus waiting for you!
+          🔔 {recentActivity.join('   •   ')}   •   UGX 9,000 Registration Bonus waiting for you!
         </div>
       </div>
 
       {/* Featured Products */}
       <div className="mx-4 mt-3">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-gray-800 font-bold text-base">Samsung Packages</h3>
+          <h3 className="text-gray-800 font-bold text-base">huawei Packages</h3>
           <button onClick={() => navigate('/product')} className="text-blue-600 text-sm font-medium">View All</button>
         </div>
         <div className="space-y-3">
