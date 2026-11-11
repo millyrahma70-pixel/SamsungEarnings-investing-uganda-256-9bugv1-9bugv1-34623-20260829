@@ -115,8 +115,8 @@ const Register = () => {
         <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-3 shadow-lg shadow-blue-500/30">
           <Smartphone className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-white text-xl font-bold">Samsung Earnings</h1>
-        <p className="text-blue-300 text-xs mt-1">Get UGX 7,000 Registration Bonus!</p>
+        <h1 className="text-white text-xl font-bold">huawei Earnings</h1>
+        <p className="text-blue-300 text-xs mt-1">Get UGX 9,000 Registration Bonus!</p>
       </div>
 
       <div className="flex-1 bg-white rounded-t-3xl px-6 pt-6 pb-6 overflow-y-auto">
@@ -186,7 +186,7 @@ const Register = () => {
           className="w-full mt-5 py-4 rounded-xl text-white font-bold text-base transition-all duration-200 active:scale-95 disabled:opacity-60"
           style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' }}
         >
-          {loading ? 'Creating...' : 'Create Account & Earn UGX 7,000'}
+          {loading ? 'Creating...' : 'Create Account & Earn UGX 9,000'}
         </button>
 
         <div className="flex items-center justify-center mt-4 gap-1">
