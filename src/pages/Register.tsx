@@ -82,11 +82,11 @@ const Register = () => {
       userId: newUser.id,
       type: 'referral_bonus',
       title: 'Welcome Bonus!',
-      message: 'Welcome to Samsung Earnings! You have received UGX 7,000 registration bonus.',
+      message: 'Welcome to Samsung Earnings! You have received UGX 9,000 registration bonus.',
       isRead: false,
     });
 
-    toast.success('Account created! You earned UGX 7,000 bonus!');
+    toast.success('Account created! You earned UGX 9,000 bonus!');
     navigate('/home');
     setLoading(false);
   };
