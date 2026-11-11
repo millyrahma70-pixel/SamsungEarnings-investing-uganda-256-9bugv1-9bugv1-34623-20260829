@@ -22,7 +22,7 @@ const NotifyModal = ({ onClose }: NotifyModalProps) => {
             📱 huawei Earnings officially launched in Uganda!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
-            💰 Invest UGX 20,000 and withdraw UGX 9,000 instantly!
+            💰 Invest UGX 25,000 and withdraw UGX 9,000 instantly!
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">
             🎁 Register now and receive UGX 9,000 bonus!
