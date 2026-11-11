@@ -45,7 +45,7 @@ const Login = () => {
         <div className="w-20 h-20 rounded-2xl bg-blue-600 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">
           <Smartphone className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-white text-2xl font-bold tracking-wide">Samsung Earnings</h1>
+        <h1 className="text-white text-2xl font-bold tracking-wide">huawei Earnings</h1>
         <p className="text-blue-300 text-sm mt-1">Uganda's #1 Investment Platform</p>
       </div>
 
@@ -97,7 +97,7 @@ const Login = () => {
         </button>
 
         <div className="flex items-center justify-center mt-6 gap-1">
-          <span className="text-gray-500 text-sm">New to Samsung Earnings?</span>
+          <span className="text-gray-500 text-sm">New to huawei Earnings?</span>
           <Link to="/register" className="text-blue-600 font-semibold text-sm">Create Account</Link>
         </div>
 
