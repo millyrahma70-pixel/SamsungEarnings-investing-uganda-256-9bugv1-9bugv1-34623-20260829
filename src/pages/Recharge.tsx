@@ -2,9 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
 import { getCurrentUser, createRecharge } from '@/lib/storage';
 import { generateId, formatUGX } from '@/lib/utils';
-import { MTN_NUMBER, MTN_NAME, AIRTEL_NUMBER, AIRTEL_NAME, MIN_DEPOSIT } from '@/constants/packages';
+import {
+  MTN_NUMBER,
+  MTN_NAME,
+  AIRTEL_NUMBER,
+  AIRTEL_NAME,
+  MIN_DEPOSIT,
+} from '@/constants/packages';
 import { Recharge as RechargeType } from '@/types';
 
 const Recharge = () => {
@@ -21,12 +28,12 @@ const Recharge = () => {
   const [paymentUrl, setPaymentUrl] = useState('');
 
   useEffect(() => {
-    const u = getCurrentUser();
-    if (!u) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
       navigate('/login');
       return;
     }
-    setUser(u);
+    setUser(currentUser);
   }, [navigate]);
 
   const targetNumber = network === 'mtn' ? MTN_NUMBER : AIRTEL_NUMBER;
@@ -53,17 +60,17 @@ const Recharge = () => {
     }
 
     if (!senderPhone || !senderName) {
-      toast.error('Please enter your phone number and your name.');
+      toast.error('Please enter your phone number and name.');
       return;
     }
 
     setSubmitting(true);
 
     try {
-      const ref = generateId();
+      const rechargeReference = generateId();
 
       const recharge: RechargeType = {
-        id: ref,
+        id: rechargeReference,
         userId: user.id,
         userName: user.name,
         userPhone: user.phone,
@@ -71,7 +78,7 @@ const Recharge = () => {
         network,
         senderPhone,
         senderName,
-        proof: `PesaJet payment reference: ${ref}`,
+        proof: `PesaJet payment reference: ${rechargeReference}`,
         status: 'pending',
         createdAt: new Date().toISOString(),
         processedAt: null,
@@ -90,9 +97,7 @@ const Recharge = () => {
           senderPhone,
           senderName,
           userId: user.id,
-          userName: user.name,
-          reference: ref,
-          phone: user.phone,
+          reference: rechargeReference,
         }),
       });
 
@@ -102,10 +107,11 @@ const Recharge = () => {
         throw new Error(data?.message || 'Unable to start PesaJet payment.');
       }
 
-      setReference(data.reference || ref);
+      setReference(data.reference || rechargeReference);
       setPaymentUrl(data.paymentUrl || '');
 
       toast.success('PesaJet payment started successfully.');
+
       setStep(3);
     } catch (error: any) {
       console.error('Recharge payment error:', error);
@@ -198,7 +204,7 @@ const Recharge = () => {
             style={{ background: 'linear-gradient(135deg, #0a0f2e, #1d4ed8)' }}
           >
             <div className="text-white/70 text-sm mb-3">
-              You are paying {formatUGX(Number(amount))} via:
+              Pay {formatUGX(Number(amount))} using:
             </div>
 
             <div className="flex items-center justify-between mb-2">
@@ -225,10 +231,10 @@ const Recharge = () => {
 
             <div className="bg-white/10 rounded-xl p-3 mt-3">
               <p className="text-white/80 text-xs leading-relaxed">
-                1. Confirm your payment details below<br />
-                2. Start the PesaJet payment<br />
-                3. Complete the payment with your mobile money account<br />
-                4. Your recharge will be approved after confirmation
+                1. Confirm your payment details<br />
+                2. Click &quot;Pay with PesaJet&quot;<br />
+                3. Complete the payment using your mobile money account<br />
+                4. Wait for confirmation and approval
               </p>
             </div>
           </div>
@@ -294,17 +300,21 @@ const Recharge = () => {
             <span className="text-4xl">⏳</span>
           </div>
 
-          <h2 className="text-gray-800 font-bold text-xl mb-2">Recharge in Progress</h2>
+          <h2 className="text-gray-800 font-bold text-xl mb-2">
+            Recharge in Progress
+          </h2>
 
           <p className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
-            Your recharge request has been created. Complete the payment using PesaJet,
+            Your recharge request has been created. Complete the payment via PesaJet,
             then your balance will be credited after confirmation.
           </p>
 
           <div className="w-full bg-white rounded-2xl p-5 shadow-sm mb-4 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Amount</span>
-              <span className="text-gray-800 font-bold">{formatUGX(Number(amount))}</span>
+              <span className="text-gray-800 font-bold">
+                {formatUGX(Number(amount))}
+              </span>
             </div>
 
             <div className="flex justify-between text-sm">
@@ -321,7 +331,9 @@ const Recharge = () => {
 
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Reference</span>
-              <span className="text-gray-800 font-medium break-all">{reference || 'Pending'}</span>
+              <span className="text-gray-800 font-medium break-all">
+                {reference || 'Pending'}
+              </span>
             </div>
 
             <div className="flex justify-between text-sm">
