@@ -1,17 +1,29 @@
 import { supabase } from '@/lib/supabase';
-import { User, UserProduct, Withdrawal, Recharge, Wallet, RedeemCode, Notification } from '@/types';
+import type { User, UserProduct, Recharge, Withdrawal, Wallet, RedeemCode, Notification } from '@/types';
+export { startRechargePayment } from '@/lib/recharge';
 
-// ─── Current User Session ────────────
-const SESSION_KEY = 'huawei_current_user';
-const ADMIN_SESSION_KEY = 'huawei_mobile_earning_admin_session';
+// ─── Session helpers ────────────────────────────────────────────────────────
 
-export const getCurrentUser = (): User | null => {
-  try { const raw = localStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
-};
-export const setCurrentUser = (user: User | null): void => {
-  if (user) localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  else localStorage.removeItem(SESSION_KEY);
-};
+const USER_KEY = 'samsung_current_user';
+const ADMIN_KEY = 'samsung_admin_session';
+
+export function getCurrentUser(): User | null {
+  try {
+    const raw = sessionStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCurrentUser(user: User | null): void {
+  if (user) {
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  } else {
+    sessionStorage.removeItem(USER_KEY);
+  }
+}
+
 export async function refreshCurrentUser(): Promise<User | null> {
   const cached = getCurrentUser();
   if (!cached) return null;
@@ -19,191 +31,640 @@ export async function refreshCurrentUser(): Promise<User | null> {
   if (fresh) setCurrentUser(fresh);
   return fresh;
 }
-export const getAdminSession = (): boolean => localStorage.getItem(ADMIN_SESSION_KEY) === 'true';
-export const setAdminSession = (v: boolean): void => v ? localStorage.setItem(ADMIN_SESSION_KEY, 'true') : localStorage.removeItem(ADMIN_SESSION_KEY);
 
-function dbToUser(r: Record<string, unknown>): User {
-  return { id: r.id as string, name: r.name as string, phone: r.phone as string, password: r.password as string, balance: Number(r.balance), totalEarnings: Number(r.total_earnings), dailyEarnings: Number(r.daily_earnings), referralEarnings: Number(r.referral_earnings), totalWithdrawal: Number(r.total_withdrawal), registrationBonus: Number(r.registration_bonus ?? 9000), referralCode: r.referral_code as string, referredBy: (r.referred_by as string | null) ?? null, frozen: Boolean(r.frozen), claimedMissions: (r.claimed_missions as string[]) ?? [], lastCheckIn: (r.last_check_in as string | null) ?? null, createdAt: r.created_at as string };
-}
-function dbToProduct(r: Record<string, unknown>): UserProduct {
-  return { id: r.id as string, userId: r.user_id as string, packageId: r.package_id as string, packageName: r.package_name as string, packagePrice: Number(r.package_price), dailyIncome: Number(r.daily_income), duration: Number(r.duration), status: r.status as UserProduct['status'], buyDate: (r.buy_date as string) ?? new Date().toISOString(), expiryDate: (r.expiry_date as string) ?? new Date().toISOString(), lastIncomeDate: (r.last_income_date as string | null) ?? null, totalIncomeEarned: Number(r.total_income_earned), paymentProof: (r.payment_proof as string) ?? '' };
-}
-function dbToWithdrawal(r: Record<string, unknown>): Withdrawal {
-  return { id: r.id as string, userId: r.user_id as string, userName: (r.user_name as string) ?? '', userPhone: (r.user_phone as string) ?? '', amount: Number(r.amount), netAmount: Number(r.net_amount), walletType: r.wallet_type as Withdrawal['walletType'], walletPhone: r.wallet_phone as string, walletName: r.wallet_name as string, status: r.status as Withdrawal['status'], createdAt: r.created_at as string, processedAt: (r.processed_at as string | null) ?? null };
-}
-function dbToRecharge(r: Record<string, unknown>): Recharge {
-  return { id: r.id as string, userId: r.user_id as string, userName: (r.user_name as string) ?? '', userPhone: (r.user_phone as string) ?? '', amount: Number(r.amount), network: r.network as Recharge['network'], senderPhone: r.sender_phone as string, senderName: (r.sender_name as string) ?? '', proof: r.proof as string, status: r.status as Recharge['status'], createdAt: r.created_at as string, processedAt: (r.processed_at as string | null) ?? null };
-}
-function dbToWallet(r: Record<string, unknown>): Wallet {
-  return { id: r.id as string, userId: r.user_id as string, type: r.type as Wallet['type'], phone: r.phone as string, name: r.name as string, createdAt: r.created_at as string };
-}
-function dbToRedeemCode(r: Record<string, unknown>): RedeemCode {
-  return { id: r.id as string, code: r.code as string, amount: Number(r.amount), createdAt: r.created_at as string, expiresAt: r.expires_at as string, usedBy: (r.used_by as string[]) ?? [], isActive: Boolean(r.is_active) };
-}
-function dbToNotification(r: Record<string, unknown>): Notification {
-  return { id: r.id as string, userId: r.user_id as string, type: r.type as Notification['type'], title: r.title as string, message: r.message as string, isRead: Boolean(r.is_read), createdAt: r.created_at as string };
+export function getAdminSession(): boolean {
+  return sessionStorage.getItem(ADMIN_KEY) === 'true';
 }
 
-// ─── Users ───
-export async function getUsers(): Promise<User[]> {
-  const { data } = await supabase.from('huawei_users').select('*').order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToUser(r as Record<string, unknown>));
-}
-
-// ✅ FIXED ONLY THIS: samsung_users -> huawei_users, so Login finds what Register saved
-export async function getUserByPhone(phone: string): Promise<User | null> {
-  const { data } = await supabase.from('huawei_users').select('*').eq('phone', phone).single();
-  return data ? dbToUser(data as Record<string, unknown>) : null;
-}
-export async function getUserById(id: string): Promise<User | null> {
-  const { data } = await supabase.from('huawei_users').select('*').eq('id', id).single();
-  return data ? dbToUser(data as Record<string, unknown>) : null;
-}
-export async function getUserByReferralCode(code: string): Promise<User | null> {
-  const { data } = await supabase.from('huawei_users').select('*').ilike('referral_code', code.trim()).single();
-  return data ? dbToUser(data as Record<string, unknown>) : null;
-}
-export async function createUser(user: User): Promise<void> {
-  await supabase.from('huawei_users').insert({ id: user.id, name: user.name, phone: user.phone, password: user.password, balance: user.balance, total_earnings: user.totalEarnings, daily_earnings: user.dailyEarnings, referral_earnings: user.referralEarnings, total_withdrawal: user.totalWithdrawal, registration_bonus: user.registrationBonus, referral_code: user.referralCode, referred_by: user.referredBy, frozen: user.frozen ?? false, claimed_missions: user.claimedMissions ?? [], last_check_in: user.lastCheckIn ?? null });
-}
-export async function updateUser(user: User): Promise<void> {
-  await supabase.from('huawei_users').update({ name: user.name, phone: user.phone, password: user.password, balance: user.balance, total_earnings: user.totalEarnings, daily_earnings: user.dailyEarnings, referral_earnings: user.referralEarnings, total_withdrawal: user.totalWithdrawal, registration_bonus: user.registrationBonus, referral_code: user.referralCode, referred_by: user.referredBy, frozen: user.frozen ?? false, claimed_missions: user.claimedMissions ?? [], last_check_in: user.lastCheckIn ?? null }).eq('id', user.id);
-  const current = getCurrentUser();
-  if (current?.id === user.id) setCurrentUser(user);
-}
-export async function deleteUserById(id: string): Promise<void> {
-  await supabase.from('huawei_users').delete().eq('id', id);
-}
-
-// ─── Products ───
-export async function getProducts(): Promise<UserProduct[]> {
-  const { data } = await supabase.from('huawei_products').select('*').order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToProduct(r as Record<string, unknown>));
-}
-export async function getUserProducts(userId: string): Promise<UserProduct[]> {
-  const { data } = await supabase.from('huawei_products').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToProduct(r as Record<string, unknown>));
-}
-// ✅ FIXED ONLY THIS: samsung_products -> huawei_products
-export async function createProduct(p: UserProduct): Promise<void> {
-  await supabase.from('huawei_products').insert({ id: p.id, user_id: p.userId, package_id: p.packageId, package_name: p.packageName, package_price: p.packagePrice, daily_income: p.dailyIncome, duration: p.duration, status: p.status, buy_date: p.buyDate, expiry_date: p.expiryDate, last_income_date: p.lastIncomeDate, total_income_earned: p.totalIncomeEarned, payment_proof: p.paymentProof });
-}
-export async function updateProduct(p: UserProduct): Promise<void> {
-  await supabase.from('huawei_products').update({ package_id: p.packageId, package_name: p.packageName, package_price: p.packagePrice, daily_income: p.dailyIncome, duration: p.duration, status: p.status, buy_date: p.buyDate, expiry_date: p.expiryDate, last_income_date: p.lastIncomeDate, total_income_earned: p.totalIncomeEarned, payment_proof: p.paymentProof }).eq('id', p.id);
-}
-export async function deleteProduct(id: string): Promise<void> {
-  await supabase.from('huawei_products').delete().eq('id', id);
-}
-
-// ─── Withdrawals ───
-export async function getWithdrawals(): Promise<Withdrawal[]> {
-  const { data } = await supabase.from('huawei_withdrawals').select('*').order('created_at', { ascending: true });
-  return (data ?? []).map(r => dbToWithdrawal(r as Record<string, unknown>));
-}
-export async function getUserWithdrawals(userId: string): Promise<Withdrawal[]> {
-  const { data } = await supabase.from('huawei_withdrawals').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToWithdrawal(r as Record<string, unknown>));
-}
-export async function createWithdrawal(w: Withdrawal): Promise<void> {
-  await supabase.from('huawei_withdrawals').insert({ id: w.id, user_id: w.userId, user_name: w.userName, user_phone: w.userPhone, amount: w.amount, net_amount: w.netAmount, wallet_type: w.walletType, wallet_phone: w.walletPhone, wallet_name: w.walletName, status: w.status });
-}
-export async function updateWithdrawal(w: Withdrawal): Promise<void> {
-  await supabase.from('huawei_withdrawals').update({ status: w.status, processed_at: w.processedAt }).eq('id', w.id);
-}
-
-// ─── Recharges - NEW WAY: PesaJet Prompt ───
-// User does NOT send to MTN/Airtel number. User requests -> Admin sends prompt via PesaJet app -> User enters PIN -> Admin approves.
-// This function only saves the REQUEST as pending. No proof needed.
-export async function getRecharges(): Promise<Recharge[]> {
-  const { data } = await supabase.from('huawei_recharges').select('*').order('created_at', { ascending: true });
-  return (data ?? []).map(r => dbToRecharge(r as Record<string, unknown>));
-}
-export async function getUserRecharges(userId: string): Promise<Recharge[]> {
-  const { data } = await supabase.from('huawei_recharges').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToRecharge(r as Record<string, unknown>));
-}
-export async function createRecharge(r: Recharge): Promise<void> {
-  await supabase.from('huawei_recharges').insert({ id: r.id, user_id: r.userId, user_name: r.userName, user_phone: r.userPhone, amount: r.amount, network: r.network, sender_phone: r.senderPhone, sender_name: r.senderName, proof: 'WAITING-ADMIN', status: 'pending' });
-}
-export async function updateRecharge(r: Recharge): Promise<void> {
-  await supabase.from('huawei_recharges').update({ status: r.status, processed_at: r.processedAt }).eq('id', r.id);
-}
-
-// ─── Wallets ───
-export async function getWallets(): Promise<Wallet[]> {
-  const { data } = await supabase.from('huawei_wallets').select('*');
-  return (data ?? []).map(r => dbToWallet(r as Record<string, unknown>));
-}
-export async function getUserWallets(userId: string): Promise<Wallet[]> {
-  const { data } = await supabase.from('huawei_wallets').select('*').eq('user_id', userId);
-  return (data ?? []).map(r => dbToWallet(r as Record<string, unknown>));
-}
-export async function saveWallet(w: Wallet): Promise<void> {
-  await supabase.from('huawei_wallets').upsert({ id: w.id, user_id: w.userId, type: w.type, phone: w.phone, name: w.name });
-}
-export async function deleteWalletsByUser(userId: string): Promise<void> {
-  await supabase.from('huawei_wallets').delete().eq('user_id', userId);
-}
-
-// ─── Redeem Codes ───
-export async function getRedeemCodes(): Promise<RedeemCode[]> {
-  const { data } = await supabase.from('huawei_redeem_codes').select('*').order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToRedeemCode(r as Record<string, unknown>));
-}
-export async function createRedeemCode(c: RedeemCode): Promise<void> {
-  await supabase.from('huawei_redeem_codes').insert({ id: c.id, code: c.code, amount: c.amount, expires_at: c.expiresAt, used_by: c.usedBy, is_active: c.isActive });
-}
-export async function updateRedeemCode(c: RedeemCode): Promise<void> {
-  await supabase.from('huawei_redeem_codes').update({ used_by: c.usedBy, is_active: c.isActive }).eq('id', c.id);
-}
-export async function deleteRedeemCodeById(id: string): Promise<void> {
-  await supabase.from('huawei_redeem_codes').delete().eq('id', id);
-}
-
-// ─── Notifications ───
-export async function getNotifications(): Promise<Notification[]> {
-  const { data } = await supabase.from('huawei_notifications').select('*').order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToNotification(r as Record<string, unknown>));
-}
-export async function getUserNotifications(userId: string): Promise<Notification[]> {
-  const { data } = await supabase.from('huawei_notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-  return (data ?? []).map(r => dbToNotification(r as Record<string, unknown>));
-}
-export async function addNotification(notif: Omit<Notification, 'id' | 'createdAt'>): Promise<void> {
-  await supabase.from('huawei_notifications').insert({ user_id: notif.userId, type: notif.type, title: notif.title, message: notif.message, is_read: notif.isRead ?? false });
-}
-export async function markNotificationRead(id: string): Promise<void> {
-  await supabase.from('huawei_notifications').update({ is_read: true }).eq('id', id);
-}
-export async function deleteNotificationsByUser(userId: string): Promise<void> {
-  await supabase.from('huawei_notifications').delete().eq('user_id', userId);
-}
-
-// ─── Daily Income - FIXED: 1 TIME PER 24 HOURS ───
-// OLD BUG: if lastIncomeDate was null, it used 25 hours -> paid immediately on same day.
-// NEW: if null, use buyDate. Must wait full 24h from buyDate / last pay. Product is locked FIRST, then user paid - no double pay.
-export async function runDailyIncomeWithStats(): Promise<{ credited: number; total: number }> {
-  const products = await getProducts();
-  const now = new Date();
-  let credited = 0; let total = 0;
-  for (const product of products) {
-    if (product.status !== 'active') continue;
-    const expiry = new Date(product.expiryDate);
-    if (now > expiry) { await updateProduct({ ...product, status: 'expired' }); continue; }
-    const lastPay = product.lastIncomeDate ? new Date(product.lastIncomeDate) : new Date(product.buyDate);
-    const hoursSinceLast = (now.getTime() - lastPay.getTime()) / (1000 * 60 * 60);
-    if (hoursSinceLast < 24) continue; // Not yet 24h - SKIP, only 1 time per day
-    const user = await getUserById(product.userId);
-    if (!user) continue;
-    // Lock product FIRST
-    await updateProduct({ ...product, lastIncomeDate: now.toISOString(), totalIncomeEarned: product.totalIncomeEarned + product.dailyIncome });
-    await updateUser({ ...user, balance: user.balance + product.dailyIncome, totalEarnings: user.totalEarnings + product.dailyIncome, dailyEarnings: user.dailyEarnings + product.dailyIncome });
-    await addNotification({ userId: product.userId, type: 'daily_income', title: 'Daily Income Received', message: `You earned UGX ${product.dailyIncome.toLocaleString()} from ${product.packageName}`, isRead: false });
-    credited += 1; total += product.dailyIncome;
+export function setAdminSession(value: boolean): void {
+  if (value) {
+    sessionStorage.setItem(ADMIN_KEY, 'true');
+  } else {
+    sessionStorage.removeItem(ADMIN_KEY);
   }
-  return { credited, total };
 }
-export async function processDailyIncome(): Promise<void> {
-  await runDailyIncomeWithStats(); // Use same logic, no duplicate code
-                                                                       }
- 
+
+// ─── Row mapper helpers ─────────────────────────────────────────────────────
+
+function mapUser(row: Record<string, unknown>): User {
+  return {
+    id: row.id as string,
+    phone: row.phone as string,
+    password: row.password as string,
+    name: row.name as string,
+    referralCode: row.referral_code as string,
+    referredBy: (row.referred_by as string) || null,
+    balance: Number(row.balance ?? 0),
+    totalEarnings: Number(row.total_earnings ?? 0),
+    totalWithdrawal: Number(row.total_withdrawal ?? 0),
+    referralEarnings: Number(row.referral_earnings ?? 0),
+    dailyEarnings: Number(row.daily_earnings ?? 0),
+    registrationBonus: Number(row.registration_bonus ?? 7000),
+    lastCheckIn: (row.last_check_in as string) || null,
+    createdAt: row.created_at as string,
+    claimedMissions: (row.claimed_missions as string[]) || [],
+    frozen: Boolean(row.frozen),
+  };
+}
+
+function mapProduct(row: Record<string, unknown>): UserProduct {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    packageId: row.package_id as string,
+    packageName: row.package_name as string,
+    packagePrice: Number(row.package_price ?? 0),
+    dailyIncome: Number(row.daily_income ?? 0),
+    duration: Number(row.duration ?? 0),
+    buyDate: row.buy_date as string,
+    expiryDate: row.expiry_date as string,
+    status: row.status as UserProduct['status'],
+    lastIncomeDate: (row.last_income_date as string) || null,
+    totalIncomeEarned: Number(row.total_income_earned ?? 0),
+    paymentProof: (row.payment_proof as string) || '',
+  };
+}
+
+function mapRecharge(row: Record<string, unknown>): Recharge {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    userName: (row.user_name as string) || '',
+    userPhone: (row.user_phone as string) || '',
+    amount: Number(row.amount ?? 0),
+    network: row.network as Recharge['network'],
+    senderPhone: (row.sender_phone as string) || '',
+    senderName: (row.sender_name as string) || '',
+    proof: (row.proof as string) || '',
+    status: row.status as Recharge['status'],
+    createdAt: row.created_at as string,
+    processedAt: (row.processed_at as string) || null,
+  };
+}
+
+function mapWithdrawal(row: Record<string, unknown>): Withdrawal {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    userName: (row.user_name as string) || '',
+    userPhone: (row.user_phone as string) || '',
+    amount: Number(row.amount ?? 0),
+    netAmount: Number(row.net_amount ?? 0),
+    walletType: row.wallet_type as Withdrawal['walletType'],
+    walletPhone: (row.wallet_phone as string) || '',
+    walletName: (row.wallet_name as string) || '',
+    status: row.status as Withdrawal['status'],
+    createdAt: row.created_at as string,
+    processedAt: (row.processed_at as string) || null,
+  };
+}
+
+function mapWallet(row: Record<string, unknown>): Wallet {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    type: row.type as Wallet['type'],
+    phone: row.phone as string,
+    name: row.name as string,
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapRedeemCode(row: Record<string, unknown>): RedeemCode {
+  return {
+    id: row.id as string,
+    code: row.code as string,
+    amount: Number(row.amount ?? 0),
+    createdAt: row.created_at as string,
+    expiresAt: row.expires_at as string,
+    usedBy: (row.used_by as string[]) || [],
+    isActive: Boolean(row.is_active),
+  };
+}
+
+function mapNotification(row: Record<string, unknown>): Notification {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    type: row.type as string,
+    title: row.title as string,
+    message: row.message as string,
+    isRead: Boolean(row.is_read),
+    createdAt: row.created_at as string,
+  };
+}
+
+// ─── Users ──────────────────────────────────────────────────────────────────
+
+export async function getUsers(): Promise<User[]> {
+  const { data, error } = await supabase
+    .from('samsung_users')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getUsers error:', error); return []; }
+  return (data || []).map(mapUser);
+}
+
+export async function getUserById(id: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('samsung_users')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) { console.error('getUserById error:', error); return null; }
+  return data ? mapUser(data) : null;
+}
+
+export async function getUserByPhone(phone: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('samsung_users')
+    .select('*')
+    .eq('phone', phone)
+    .single();
+  if (error && error.code !== 'PGRST116') { console.error('getUserByPhone error:', error); }
+  return data ? mapUser(data) : null;
+}
+
+export async function getUserByReferralCode(code: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('samsung_users')
+    .select('*')
+    .eq('referral_code', code)
+    .single();
+  if (error && error.code !== 'PGRST116') { console.error('getUserByReferralCode error:', error); }
+  return data ? mapUser(data) : null;
+}
+
+export async function createUser(user: Omit<User, 'createdAt'>): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('samsung_users')
+    .insert({
+      id: user.id || crypto.randomUUID(),
+      phone: user.phone,
+      password: user.password,
+      name: user.name,
+      referral_code: user.referralCode,
+      referred_by: user.referredBy || null,
+      balance: user.balance,
+      total_earnings: user.totalEarnings,
+      total_withdrawal: user.totalWithdrawal,
+      referral_earnings: user.referralEarnings,
+      daily_earnings: user.dailyEarnings,
+      registration_bonus: user.registrationBonus,
+      last_check_in: user.lastCheckIn || null,
+      claimed_missions: user.claimedMissions || [],
+      frozen: user.frozen || false,
+    })
+    .select()
+    .single();
+  if (error) { console.error('createUser error:', error); return null; }
+  return data ? mapUser(data) : null;
+}
+
+export async function updateUser(
+  userOrId: User | string,
+  patch?: Partial<Record<string, unknown>>
+): Promise<void> {
+  let id: string;
+  let updateData: Record<string, unknown>;
+
+  if (typeof userOrId === 'string') {
+    id = userOrId;
+    const p = patch || {};
+    updateData = {};
+    if ('balance' in p) updateData.balance = p.balance;
+    if ('totalEarnings' in p) updateData.total_earnings = p.totalEarnings;
+    if ('totalWithdrawal' in p) updateData.total_withdrawal = p.totalWithdrawal;
+    if ('referralEarnings' in p) updateData.referral_earnings = p.referralEarnings;
+    if ('dailyEarnings' in p) updateData.daily_earnings = p.dailyEarnings;
+    if ('frozen' in p) updateData.frozen = p.frozen;
+    if ('password' in p) updateData.password = p.password;
+    if ('claimedMissions' in p) updateData.claimed_missions = p.claimedMissions;
+    if ('lastCheckIn' in p) updateData.last_check_in = p.lastCheckIn;
+    if ('name' in p) updateData.name = p.name;
+  } else {
+    id = userOrId.id;
+    updateData = {
+      phone: userOrId.phone,
+      password: userOrId.password,
+      name: userOrId.name,
+      referral_code: userOrId.referralCode,
+      referred_by: userOrId.referredBy || null,
+      balance: userOrId.balance,
+      total_earnings: userOrId.totalEarnings,
+      total_withdrawal: userOrId.totalWithdrawal,
+      referral_earnings: userOrId.referralEarnings,
+      daily_earnings: userOrId.dailyEarnings,
+      registration_bonus: userOrId.registrationBonus,
+      last_check_in: userOrId.lastCheckIn || null,
+      claimed_missions: userOrId.claimedMissions || [],
+      frozen: userOrId.frozen || false,
+    };
+  }
+
+  const { error } = await supabase
+    .from('samsung_users')
+    .update(updateData)
+    .eq('id', id);
+  if (error) console.error('updateUser error:', error);
+}
+
+export async function deleteUserById(id: string): Promise<void> {
+  const { error } = await supabase.from('samsung_users').delete().eq('id', id);
+  if (error) console.error('deleteUserById error:', error);
+}
+
+// ─── Products ───────────────────────────────────────────────────────────────
+
+export async function getProducts(): Promise<UserProduct[]> {
+  const { data, error } = await supabase
+    .from('samsung_products')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getProducts error:', error); return []; }
+  return (data || []).map(mapProduct);
+}
+
+export async function getUserProducts(userId: string): Promise<UserProduct[]> {
+  const { data, error } = await supabase
+    .from('samsung_products')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getUserProducts error:', error); return []; }
+  return (data || []).map(mapProduct);
+}
+
+export async function createProduct(product: {
+  user_id: string;
+  package_id: string;
+  package_name: string;
+  package_price: number;
+  daily_income: number;
+  duration: number;
+  status: string;
+  buy_date: string;
+  expiry_date: string;
+  last_income_date: string;
+  total_income_earned: number;
+  payment_proof: string;
+}): Promise<void> {
+  const { error } = await supabase.from('samsung_products').insert(product);
+  if (error) console.error('createProduct error:', error);
+}
+
+// ─── Recharges ──────────────────────────────────────────────────────────────
+
+export async function getRecharges(): Promise<Recharge[]> {
+  const { data, error } = await supabase
+    .from('samsung_recharges')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getRecharges error:', error); return []; }
+  return (data || []).map(mapRecharge);
+}
+
+export async function getUserRecharges(userId: string): Promise<Recharge[]> {
+  const { data, error } = await supabase
+    .from('samsung_recharges')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getUserRecharges error:', error); return []; }
+  return (data || []).map(mapRecharge);
+}
+
+export async function createRecharge(recharge: Recharge): Promise<void> {
+  const { error } = await supabase.from('samsung_recharges').insert({
+    id: recharge.id,
+    user_id: recharge.userId,
+    user_name: recharge.userName,
+    user_phone: recharge.userPhone,
+    amount: recharge.amount,
+    network: recharge.network,
+    sender_phone: recharge.senderPhone,
+    sender_name: recharge.senderName,
+    proof: recharge.proof,
+    status: recharge.status,
+    created_at: recharge.createdAt,
+    processed_at: recharge.processedAt,
+  });
+  if (error) console.error('createRecharge error:', error);
+}
+
+export async function updateRecharge(
+  id: string,
+  patch: Partial<{ status: string; processedAt: string }>
+): Promise<void> {
+  const updateData: Record<string, unknown> = {};
+  if (patch.status !== undefined) updateData.status = patch.status;
+  if (patch.processedAt !== undefined) updateData.processed_at = patch.processedAt;
+  const { error } = await supabase.from('samsung_recharges').update(updateData).eq('id', id);
+  if (error) console.error('updateRecharge error:', error);
+}
+
+// ─── Withdrawals ─────────────────────────────────────────────────────────────
+
+export async function getWithdrawals(): Promise<Withdrawal[]> {
+  const { data, error } = await supabase
+    .from('samsung_withdrawals')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getWithdrawals error:', error); return []; }
+  return (data || []).map(mapWithdrawal);
+}
+
+export async function getUserWithdrawals(userId: string): Promise<Withdrawal[]> {
+  const { data, error } = await supabase
+    .from('samsung_withdrawals')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getUserWithdrawals error:', error); return []; }
+  return (data || []).map(mapWithdrawal);
+}
+
+export async function createWithdrawal(withdrawal: Withdrawal): Promise<void> {
+  const { error } = await supabase.from('samsung_withdrawals').insert({
+    id: withdrawal.id,
+    user_id: withdrawal.userId,
+    user_name: withdrawal.userName,
+    user_phone: withdrawal.userPhone,
+    amount: withdrawal.amount,
+    net_amount: withdrawal.netAmount,
+    wallet_type: withdrawal.walletType,
+    wallet_phone: withdrawal.walletPhone,
+    wallet_name: withdrawal.walletName,
+    status: withdrawal.status,
+    created_at: withdrawal.createdAt,
+    processed_at: withdrawal.processedAt,
+  });
+  if (error) console.error('createWithdrawal error:', error);
+}
+
+export async function updateWithdrawal(
+  id: string,
+  patch: Partial<{ status: string; processedAt: string }>
+): Promise<void> {
+  const updateData: Record<string, unknown> = {};
+  if (patch.status !== undefined) updateData.status = patch.status;
+  if (patch.processedAt !== undefined) updateData.processed_at = patch.processedAt;
+  const { error } = await supabase.from('samsung_withdrawals').update(updateData).eq('id', id);
+  if (error) console.error('updateWithdrawal error:', error);
+}
+
+// ─── Wallets ─────────────────────────────────────────────────────────────────
+
+export async function getUserWallets(userId: string): Promise<Wallet[]> {
+  const { data, error } = await supabase
+    .from('samsung_wallets')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getUserWallets error:', error); return []; }
+  return (data || []).map(mapWallet);
+}
+
+export async function saveWallet(wallet: Wallet): Promise<void> {
+  const { error } = await supabase.from('samsung_wallets').insert({
+    id: wallet.id,
+    user_id: wallet.userId,
+    type: wallet.type,
+    phone: wallet.phone,
+    name: wallet.name,
+    created_at: wallet.createdAt,
+  });
+  if (error) console.error('saveWallet error:', error);
+}
+
+export async function deleteWalletsByUser(userId: string): Promise<void> {
+  const { error } = await supabase.from('samsung_wallets').delete().eq('user_id', userId);
+  if (error) console.error('deleteWalletsByUser error:', error);
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────────
+
+export async function getNotifications(): Promise<Notification[]> {
+  const { data, error } = await supabase
+    .from('samsung_notifications')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getNotifications error:', error); return []; }
+  return (data || []).map(mapNotification);
+}
+
+export async function getUserNotifications(userId: string): Promise<Notification[]> {
+  const { data, error } = await supabase
+    .from('samsung_notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getUserNotifications error:', error); return []; }
+  return (data || []).map(mapNotification);
+}
+
+export async function addNotification(
+  userIdOrObj: string | { userId: string; type: string; title: string; message: string; isRead: boolean },
+  type?: string,
+  title?: string,
+  message?: string
+): Promise<void> {
+  let userId: string;
+  let notifType: string;
+  let notifTitle: string;
+  let notifMessage: string;
+
+  if (typeof userIdOrObj === 'string') {
+    userId = userIdOrObj;
+    notifType = type!;
+    notifTitle = title!;
+    notifMessage = message!;
+  } else {
+    userId = userIdOrObj.userId;
+    notifType = userIdOrObj.type;
+    notifTitle = userIdOrObj.title;
+    notifMessage = userIdOrObj.message;
+  }
+
+  const { error } = await supabase.from('samsung_notifications').insert({
+    user_id: userId,
+    type: notifType,
+    title: notifTitle,
+    message: notifMessage,
+    is_read: false,
+  });
+  if (error) console.error('addNotification error:', error);
+}
+
+export async function markNotificationRead(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('samsung_notifications')
+    .update({ is_read: true })
+    .eq('id', id);
+  if (error) console.error('markNotificationRead error:', error);
+}
+
+// ─── Redeem Codes ─────────────────────────────────────────────────────────────
+
+export async function getRedeemCodes(): Promise<RedeemCode[]> {
+  const { data, error } = await supabase
+    .from('samsung_redeem_codes')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('getRedeemCodes error:', error); return []; }
+  return (data || []).map(mapRedeemCode);
+}
+
+export async function createRedeemCode(code: RedeemCode): Promise<void> {
+  const { error } = await supabase.from('samsung_redeem_codes').insert({
+    id: code.id,
+    code: code.code,
+    amount: code.amount,
+    created_at: code.createdAt,
+    expires_at: code.expiresAt,
+    used_by: code.usedBy,
+    is_active: code.isActive,
+  });
+  if (error) console.error('createRedeemCode error:', error);
+}
+
+export async function updateRedeemCode(code: RedeemCode): Promise<void> {
+  const { error } = await supabase
+    .from('samsung_redeem_codes')
+    .update({
+      code: code.code,
+      amount: code.amount,
+      expires_at: code.expiresAt,
+      used_by: code.usedBy,
+      is_active: code.isActive,
+    })
+    .eq('id', code.id);
+  if (error) console.error('updateRedeemCode error:', error);
+}
+
+export async function deleteRedeemCodeById(id: string): Promise<void> {
+  const { error } = await supabase.from('samsung_redeem_codes').delete().eq('id', id);
+  if (error) console.error('deleteRedeemCodeById error:', error);
+}
+
+// ─── Daily Income Engine ──────────────────────────────────────────────────────
+
+export async function processDailyIncome(): Promise<{ processed: number; totalPaid: number }> {
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+
+  const { data: activeProducts, error } = await supabase
+    .from('samsung_products')
+    .select('*')
+    .eq('status', 'active');
+
+  if (error) { console.error('processDailyIncome fetch error:', error); return { processed: 0, totalPaid: 0 }; }
+
+  let processed = 0;
+  let totalPaid = 0;
+
+  for (const row of (activeProducts || [])) {
+    const product = mapProduct(row);
+    const lastDate = product.lastIncomeDate?.split('T')[0];
+
+    // Skip if already processed today
+    if (lastDate === today) continue;
+
+    // Check if expired
+    if (new Date(product.expiryDate) < now) {
+      await supabase.from('samsung_products').update({ status: 'expired' }).eq('id', product.id);
+      continue;
+    }
+
+    // Credit daily income
+    const income = product.dailyIncome;
+    const newTotal = product.totalIncomeEarned + income;
+
+    await supabase.from('samsung_products').update({
+      last_income_date: now.toISOString(),
+      total_income_earned: newTotal,
+    }).eq('id', product.id);
+
+    // Update user balance
+    const { data: userData } = await supabase
+      .from('samsung_users')
+      .select('balance, total_earnings, daily_earnings, referred_by')
+      .eq('id', product.userId)
+      .single();
+
+    if (userData) {
+      await supabase.from('samsung_users').update({
+        balance: Number(userData.balance) + income,
+        total_earnings: Number(userData.total_earnings) + income,
+        daily_earnings: Number(userData.daily_earnings) + income,
+      }).eq('id', product.userId);
+
+      // Send notification
+      await supabase.from('samsung_notifications').insert({
+        user_id: product.userId,
+        type: 'income',
+        title: 'Daily Income Credited',
+        message: `UGX ${income.toLocaleString()} daily income from ${product.packageName} has been added to your balance.`,
+        is_read: false,
+      });
+
+      // Referral commissions L1 (30%), L2 (2%), L3 (1%)
+      if (userData.referred_by) {
+        const l1Commission = Math.floor(income * 0.30);
+        const { data: l1Data } = await supabase
+          .from('samsung_users')
+          .select('balance, total_earnings, referral_earnings, referred_by')
+          .eq('id', userData.referred_by)
+          .single();
+        if (l1Data) {
+          await supabase.from('samsung_users').update({
+            balance: Number(l1Data.balance) + l1Commission,
+            total_earnings: Number(l1Data.total_earnings) + l1Commission,
+            referral_earnings: Number(l1Data.referral_earnings) + l1Commission,
+          }).eq('id', userData.referred_by);
+
+          if (l1Data.referred_by) {
+            const l2Commission = Math.floor(income * 0.02);
+            const { data: l2Data } = await supabase
+              .from('samsung_users')
+              .select('balance, total_earnings, referral_earnings, referred_by')
+              .eq('id', l1Data.referred_by)
+              .single();
+            if (l2Data) {
+              await supabase.from('samsung_users').update({
+                balance: Number(l2Data.balance) + l2Commission,
+                total_earnings: Number(l2Data.total_earnings) + l2Commission,
+                referral_earnings: Number(l2Data.referral_earnings) + l2Commission,
+              }).eq('id', l1Data.referred_by);
+
+              if (l2Data.referred_by) {
+                const l3Commission = Math.floor(income * 0.01);
+                const { data: l3Data } = await supabase
+                  .from('samsung_users')
+                  .select('balance, total_earnings, referral_earnings')
+                  .eq('id', l2Data.referred_by)
+                  .single();
+                if (l3Data) {
+                  await supabase.from('samsung_users').update({
+                    balance: Number(l3Data.balance) + l3Commission,
+                    total_earnings: Number(l3Data.total_earnings) + l3Commission,
+                    referral_earnings: Number(l3Data.referral_earnings) + l3Commission,
+                  }).eq('id', l2Data.referred_by);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    processed++;
+    totalPaid += income;
+  }
+
+  return { processed, totalPaid };
+}
+
+export async function runDailyIncomeWithStats(): Promise<{ processed: number; totalPaid: number }> {
+  return processDailyIncome();
+  }
