@@ -10,11 +10,21 @@ export function formatUGX(amount: number): string {
 }
 
 export function generateReferralCode(): string {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
+  // No confusing chars: no 0/O, no 1/I - so users don't mistype referral code
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 }
 
 export function generateId(): string {
-  return crypto.randomUUID();
+  // FIXED: Fallback for phones / non-HTTPS where crypto.randomUUID() crashes
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 10)}`;
 }
 
 export function formatDate(dateStr: string): string {
@@ -59,13 +69,30 @@ export function isToday(dateStr: string): boolean {
 export function getReferralLink(code: string): string {
   const origin = typeof window !== 'undefined'
     ? window.location.origin
-    : 'https://samsungearnings.onspace.app';
-  // import.meta.env.BASE_URL includes the trailing slash (e.g. '/SamsungEarnings-investing-uganda-256/')
-  const basePath = import.meta.env.BASE_URL ?? '/';
-  return `${origin}${basePath}register?ref=${code}`;
+    : 'https://huaweiearnings.onspace.app';
+
+  // FIXED: Handle BASE_URL correctly - no double slash, works on GitHub Pages + onspace
+  const rawBase = import.meta.env.BASE_URL ?? '/';
+  const basePath = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+  // If base is just '/', don't add it twice
+  const cleanBase = basePath === '/' ? '/' : basePath;
+
+  return `${origin}${cleanBase}register?ref=${code}`;
 }
 
 export function generateQRDataURL(text: string): string {
-  // QR code via qrserver API
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}&bgcolor=ffffff&color=1a1a2e`;
 }
+
+// ─── Daily Income Helper - 1 time per 24h ───
+export function canClaimDailyIncome(lastIncomeDate: string | null, buyDate: string): boolean {
+  const last = lastIncomeDate ? new Date(lastIncomeDate) : new Date(buyDate);
+  const hoursSince = (Date.now() - last.getTime()) / (1000 * 60 * 60);
+  return hoursSince >= 24;
+}
+
+export function hoursUntilNextIncome(lastIncomeDate: string | null, buyDate: string): number {
+  const last = lastIncomeDate ? new Date(lastIncomeDate) : new Date(buyDate);
+  const hoursSince = (Date.now() - last.getTime()) / (1000 * 60 * 60);
+  return Math.max(0, Math.ceil(24 - hoursSince));
+                          }
