@@ -3,13 +3,13 @@
  * to the new Supabase cloud database.
  *
  * Old localStorage keys (from the pre-cloud version):
- *   - samsung_users        → array of User objects
- *   - samsung_products     → array of UserProduct objects
- *   - samsung_withdrawals  → array of Withdrawal objects
- *   - samsung_recharges    → array of Recharge objects
- *   - samsung_wallets      → array of Wallet objects
- *   - samsung_redeem_codes → array of RedeemCode objects
- *   - samsung_notifications→ array of Notification objects
+ *   - huawei_users        → array of User objects
+ *   - huawei_products     → array of UserProduct objects
+ *   - huawei_withdrawals  → array of Withdrawal objects
+ *   - huawei_recharges    → array of Recharge objects
+ *   - huawei_wallets      → array of Wallet objects
+ *   - huawei_redeem_codes → array of RedeemCode objects
+ *   - huawei_notifications→ array of Notification objects
  *
  * After successful migration all old keys are removed and a
  * migration-complete flag is written so the process never runs again.
@@ -19,16 +19,16 @@ import { supabase } from '@/lib/supabase';
 import { User, UserProduct, Withdrawal, Recharge, Wallet, RedeemCode, Notification } from '@/types';
 
 const LEGACY_KEYS = {
-  users: 'samsung_users',
-  products: 'samsung_products',
-  withdrawals: 'samsung_withdrawals',
-  recharges: 'samsung_recharges',
-  wallets: 'samsung_wallets',
-  redeemCodes: 'samsung_redeem_codes',
-  notifications: 'samsung_notifications',
+  users: 'huawei_users',
+  products: 'huawei_products',
+  withdrawals: 'huawei_withdrawals',
+  recharges: 'huawei_recharges',
+  wallets: 'huawei_wallets',
+  redeemCodes: 'huawei_redeem_codes',
+  notifications: 'huawei_notifications',
 };
 
-const MIGRATION_FLAG = 'samsung_cloud_migrated_v1';
+const MIGRATION_FLAG = 'huawei_cloud_migrated_v1';
 
 export function hasPendingMigration(): boolean {
   if (localStorage.getItem(MIGRATION_FLAG) === 'done') return false;
@@ -120,7 +120,7 @@ export async function runMigration(
     last_check_in: u.lastCheckIn ?? null,
     created_at: u.createdAt ?? new Date().toISOString(),
   }));
-  stats.users = await upsertBatch('samsung_users', userRows, stats.errors);
+  stats.users = await upsertBatch('huawei_users', userRows, stats.errors);
 
   // ── 2. Products ───────────────────────────────────────────────────────────
   report('Migrating products…', 20);
@@ -141,7 +141,7 @@ export async function runMigration(
     payment_proof: p.paymentProof ?? '',
     created_at: new Date().toISOString(),
   }));
-  stats.products = await upsertBatch('samsung_products', productRows, stats.errors);
+  stats.products = await upsertBatch('huawei_products', productRows, stats.errors);
 
   // ── 3. Withdrawals ────────────────────────────────────────────────────────
   report('Migrating withdrawals…', 35);
@@ -160,7 +160,7 @@ export async function runMigration(
     created_at: w.createdAt ?? new Date().toISOString(),
     processed_at: w.processedAt ?? null,
   }));
-  stats.withdrawals = await upsertBatch('samsung_withdrawals', withdrawalRows, stats.errors);
+  stats.withdrawals = await upsertBatch('huawei_withdrawals', withdrawalRows, stats.errors);
 
   // ── 4. Recharges ──────────────────────────────────────────────────────────
   report('Migrating recharges…', 50);
@@ -179,7 +179,7 @@ export async function runMigration(
     created_at: r.createdAt ?? new Date().toISOString(),
     processed_at: r.processedAt ?? null,
   }));
-  stats.recharges = await upsertBatch('samsung_recharges', rechargeRows, stats.errors);
+  stats.recharges = await upsertBatch('huawei_recharges', rechargeRows, stats.errors);
 
   // ── 5. Wallets ────────────────────────────────────────────────────────────
   report('Migrating wallets…', 62);
@@ -192,7 +192,7 @@ export async function runMigration(
     name: w.name,
     created_at: w.createdAt ?? new Date().toISOString(),
   }));
-  stats.wallets = await upsertBatch('samsung_wallets', walletRows, stats.errors);
+  stats.wallets = await upsertBatch('huawei_wallets', walletRows, stats.errors);
 
   // ── 6. Redeem Codes ───────────────────────────────────────────────────────
   report('Migrating redeem codes…', 75);
@@ -206,7 +206,7 @@ export async function runMigration(
     used_by: c.usedBy ?? [],
     is_active: c.isActive ?? true,
   }));
-  stats.redeemCodes = await upsertBatch('samsung_redeem_codes', codeRows, stats.errors);
+  stats.redeemCodes = await upsertBatch('huawei_redeem_codes', codeRows, stats.errors);
 
   // ── 7. Notifications ──────────────────────────────────────────────────────
   report('Migrating notifications…', 88);
@@ -220,7 +220,7 @@ export async function runMigration(
     is_read: n.isRead ?? false,
     created_at: n.createdAt ?? new Date().toISOString(),
   }));
-  stats.notifications = await upsertBatch('samsung_notifications', notifRows, stats.errors);
+  stats.notifications = await upsertBatch('huawei_notifications', notifRows, stats.errors);
 
   // ── 8. Clean up localStorage ──────────────────────────────────────────────
   report('Cleaning up old data…', 96);
