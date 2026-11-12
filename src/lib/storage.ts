@@ -206,3 +206,4 @@ export async function runDailyIncomeWithStats(): Promise<{ credited: number; tot
 export async function processDailyIncome(): Promise<void> {
   await runDailyIncomeWithStats(); // Use same logic, no duplicate code
                                                                        }
+ 
