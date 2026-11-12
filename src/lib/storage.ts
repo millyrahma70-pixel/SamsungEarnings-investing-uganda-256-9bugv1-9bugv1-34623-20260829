@@ -1,21 +1,86 @@
 import { supabase } from '@/lib/supabase';
 import type { User, UserProduct, Recharge, Withdrawal, Wallet, RedeemCode, Notification } from '@/types';
-export { startRechargePayment } from '@/lib/recharge';
 
 // ─── Session helpers ────────────────────────────────────────────────────────
+// ✅ FIXED: samsung_ -> huawei_, sessionStorage -> localStorage (so login survives refresh)
+// ✅ FIXED: removed `export { startRechargePayment } from '@/lib/recharge'` 
+//    That file does not exist and was breaking the whole build.
+//    startRechargePayment is now defined IN THIS FILE below, so no missing file.
 
-const USER_KEY = 'samsung_current_user';
-const ADMIN_KEY = 'samsung_admin_session';
+const USER_KEY = 'huawei_current_user';
+const ADMIN_KEY = 'huawei_mobile_earning_admin_session';
 
 export function getCurrentUser(): User | null {
   try {
-    const raw = sessionStorage.getItem(USER_KEY);
+    const raw = localStorage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
+export function setCurrentUser(user: User | null): void {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(USER_KEY);
+  }
+}
+
+export async function refreshCurrentUser(): Promise<User | null> {
+  const cached = getCurrentUser();
+  if (!cached) return null;
+  const fresh = await getUserById(cached.id);
+  if (fresh) setCurrentUser(fresh);
+  return fresh;
+}
+
+export function getAdminSession(): boolean {
+  return localStorage.getItem(ADMIN_KEY) === 'true';
+}
+
+export function setAdminSession(v: boolean): void {
+  if (v) localStorage.setItem(ADMIN_KEY, 'true');
+  else localStorage.removeItem(ADMIN_KEY);
+}
+
+// ─── PesaJet Recharge - defined HERE, no separate file needed ───
+// User does NOT send to MTN/Airtel. Only creates PENDING request.
+// Admin sends prompt via PesaJet app, user enters PIN, admin approves.
+export async function startRechargePayment(params: {
+  userId: string;
+  userName?: string;
+  userPhone?: string;
+  amount: number;
+  network?: string;
+  senderPhone?: string;
+  senderName?: string;
+}): Promise<{ success: boolean; message: string }> {
+  try {
+    const { error } = await supabase.from('huawei_recharges').insert({
+      id: typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `rc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      user_id: params.userId,
+      user_name: params.userName ?? '',
+      user_phone: params.userPhone ?? params.senderPhone ?? '',
+      amount: params.amount,
+      network: params.network ?? 'MTN',
+      sender_phone: params.senderPhone ?? params.userPhone ?? '',
+      sender_name: params.senderName ?? params.userName ?? '',
+      proof: 'WAITING-ADMIN',
+      status: 'pending',
+    });
+    if (error) throw error;
+    return {
+      success: true,
+      message: 'Recharge request sent. Admin will send you a payment prompt. Enter your PIN to complete.',
+    };
+  } catch (e) {
+    console.error('startRechargePayment failed', e);
+    return { success: false, message: 'Failed to create recharge request. Try again.' };
+  }
+}
 export function setCurrentUser(user: User | null): void {
   if (user) {
     sessionStorage.setItem(USER_KEY, JSON.stringify(user));
