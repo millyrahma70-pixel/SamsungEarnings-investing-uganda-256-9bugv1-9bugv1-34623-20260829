@@ -12,8 +12,6 @@ const Recharge = () => {
   const [amount, setAmount] = useState('');
   const [phone, setPhone] = useState('');
   const [network, setNetwork] = useState<'mtn' | 'airtel'>('mtn');
-  const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
 
   useEffect(() => {
     const u = getCurrentUser();
@@ -34,45 +32,28 @@ const Recharge = () => {
       return;
     }
 
-    setSubmitting(true);
-    try {
-      // Call YOUR backend, never PesaJet directly from frontend
-      const res = await fetch('/api/pesajet/pay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          amount: parseInt(amount),
-          phone: phone,
-          network: network,
-        }),
-      });
+    // Save as pending BEFORE going to PesaJet
+    await createRecharge({
+      id: generateId(),
+      userId: user.id,
+      userName: user.name,
+      userPhone: phone,
+      amount: parseInt(amount),
+      network,
+      senderPhone: phone,
+      senderName: user.name,
+      proof: 'PESAJET-LINK',
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      processedAt: null,
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Payment failed');
+    // === CHANGE THIS ONE LINE ===
+    // Paste your real link from PesaJet Dashboard > Payment Links
+    const PESAJET_LINK = "https://pay.pesajet.com/YOUR-LINK-HERE";
 
-      // Save pending recharge in your DB
-      await createRecharge({
-        id: generateId(),
-        userId: user.id,
-        userName: user.name,
-        userPhone: phone,
-        amount: parseInt(amount),
-        network,
-        senderPhone: phone,
-        senderName: user.name,
-        proof: data.transactionId || 'PESAJET',
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        processedAt: null,
-      });
-
-      toast.success('Check your phone! Enter your Mobile Money PIN to complete payment.');
-      setStep(2);
-    } catch (e: any) {
-      toast.error(e.message);
-    }
-    setSubmitting(false);
+    // Go to PesaJet secure page to pay - works on GitHub Pages
+    window.location.href = `${PESAJET_LINK}?amount=${amount}&phone=${phone}&reference=${user.id}-${Date.now()}`;
   };
 
   return (
@@ -82,49 +63,37 @@ const Recharge = () => {
         <h1 className="font-bold text-lg">Recharge with PesaJet</h1>
       </div>
 
-      {step === 1 && (
-        <div className="px-4 py-5 space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-            <p className="text-blue-700 text-sm font-medium">📌 Minimum Deposit: {formatUGX(MIN_DEPOSIT)}</p>
-            <p className="text-blue-600 text-xs mt-1">You will receive a prompt on your phone to enter your PIN. No SMS proof needed.</p>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-600 mb-2 block">Amount (UGX)</label>
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount (min 25,000)" className="w-full border rounded-xl px-4 py-3 bg-white" />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-600 mb-2 block">Phone Number to Pay From</label>
-            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXXXXXXX" className="w-full border rounded-xl px-4 py-3 bg-white" />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-600 mb-2 block">Network</label>
-            <div className="grid grid-cols-2 gap-3">
-              {(['mtn', 'airtel'] as const).map((n) => (
-                <button key={n} onClick={() => setNetwork(n)} className={`py-3 rounded-xl border-2 font-semibold text-sm ${network === n ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}>
-                  {n === 'mtn' ? '📲 MTN MoMo' : '📱 Airtel Money'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button onClick={handlePayWithPesaJet} disabled={submitting} className="w-full py-4 rounded-xl text-white font-bold" style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' }}>
-            {submitting ? 'Sending Prompt...' : `Pay ${amount ? formatUGX(parseInt(amount)) : ''} with PesaJet`}
-          </button>
+      <div className="px-4 py-5 space-y-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+          <p className="text-blue-700 text-sm font-medium">📌 Minimum Deposit: {formatUGX(MIN_DEPOSIT)}</p>
+          <p className="text-blue-600 text-xs mt-1">You will be sent to PesaJet secure page. Enter your Mobile Money PIN there. No SMS proof needed.</p>
         </div>
-      )}
 
-      {step === 2 && (
-        <div className="px-4 py-8 flex flex-col items-center text-center">
-          <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4"><span className="text-4xl">📲</span></div>
-          <h2 className="font-bold text-xl mb-2">Check Your Phone!</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">We sent a payment prompt to <b>{phone}</b> for <b>{formatUGX(parseInt(amount))}</b>. Enter your Mobile Money PIN to complete.<br/><br/>Your balance will update automatically once PesaJet confirms.</p>
-          <button onClick={() => navigate('/records')} className="w-full py-4 rounded-xl text-white font-bold mt-6" style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' }}>Check Status</button>
-          <button onClick={() => navigate('/home')} className="w-full py-3 rounded-xl border mt-2 text-gray-600">Back to Home</button>
+        <div>
+          <label className="text-sm font-medium text-gray-600 mb-2 block">Amount (UGX)</label>
+          <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount (min 25,000)" className="w-full border rounded-xl px-4 py-3 bg-white" />
         </div>
-      )}
+
+        <div>
+          <label className="text-sm font-medium text-gray-600 mb-2 block">Phone Number to Pay From</label>
+          <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXXXXXXX" className="w-full border rounded-xl px-4 py-3 bg-white" />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-gray-600 mb-2 block">Network</label>
+          <div className="grid grid-cols-2 gap-3">
+            {(['mtn', 'airtel'] as const).map((n) => (
+              <button key={n} onClick={() => setNetwork(n)} className={`py-3 rounded-xl border-2 font-semibold text-sm ${network === n ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}>
+                {n === 'mtn' ? '📲 MTN MoMo' : '📱 Airtel Money'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={handlePayWithPesaJet} className="w-full py-4 rounded-xl text-white font-bold" style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' }}>
+          {`Pay ${amount ? formatUGX(parseInt(amount)) : ''} with PesaJet`}
+        </button>
+      </div>
     </div>
   );
 };
