@@ -8,115 +8,129 @@ export const PACKAGES: InvestmentPackage[] = [
     price: 25000,
     dailyIncome: 4500,
     duration: 60,
-    phone: 'huawei nova 15 Max ',
+    phone: 'Huawei Nova 15 Max',
     image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&q=80',
   },
   {
     id: 'p60-pro',
-    name: 'p60 pro',
+    name: 'P60 Pro',
     group: 1,
     price: 38000,
     dailyIncome: 9000,
     duration: 60,
-    phone: 'huawei P60pro',
+    phone: 'Huawei P60 Pro',
     image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80',
   },
   {
-    id: 'p30 pro',
-    name: 'P30 pro',
+    id: 'p30-pro',
+    name: 'P30 Pro',
     group: 2,
     price: 50000,
     dailyIncome: 12500,
     duration: 180,
-    phone: 'huawei p30 pro',
+    phone: 'Huawei P30 Pro',
     image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80',
   },
   {
-    id: 'nova-26spro',
-    name: 'Nova 16spro A35',
+    id: 'nova-16s-pro-a35',
+    name: 'Nova 16s Pro A35',
     group: 2,
     price: 100000,
     dailyIncome: 26000,
     duration: 180,
-    phone: 'huawei nova 16spro A35',
+    phone: 'Huawei Nova 16s Pro A35',
     image: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=400&q=80',
   },
   {
-    id: 'pura 80-pro',
-    name: 'Pura80 pro ',
+    id: 'pura-80-pro',
+    name: 'Pura 80 Pro',
     group: 2,
     price: 150000,
     dailyIncome: 40000,
     duration: 180,
-    phone: 'huawei pura80 pro',
+    phone: 'Huawei Pura 80 Pro',
     image: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&q=80',
   },
   {
-    id: 'pura 90s pro',
-    name: 'pura 90s pro',
+    id: 'pura-90s-pro',
+    name: 'Pura 90s Pro',
     group: 3,
     price: 300000,
     dailyIncome: 90000,
     duration: 210,
-    phone: 'huawei pura 90s pro',
+    phone: 'Huawei Pura 90s Pro',
     image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80',
   },
   {
-    id: 'pura 90s pro Max',
-    name: 'pura 90s pro Max',
+    id: 'pura-90s-pro-max',
+    name: 'Pura 90s Pro Max',
     group: 3,
     price: 500000,
     dailyIncome: 160000,
     duration: 210,
-    phone: ' huawei pura 90s pro Max',
+    phone: 'Huawei Pura 90s Pro Max',
     image: 'https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3?w=400&q=80',
   },
   {
-    id: 'Mate x17',
-    name: 'Mate x17',
+    id: 'mate-x17',
+    name: 'Mate X17',
     group: 3,
     price: 800000,
     dailyIncome: 280200,
     duration: 210,
-    phone: 'huawei mate x17',
+    phone: 'Huawei Mate X17',
     image: 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&q=80',
   },
   {
-    id: 'mate 80 pro',
-    name: 'Mate 80 pro',
+    id: 'mate-80-pro',
+    name: 'Mate 80 Pro',
     group: 3,
     price: 1200000,
     dailyIncome: 450000,
     duration: 210,
-    phone: 'huawei mate 80 pro',
+    phone: 'Huawei Mate 80 Pro',
     image: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=400&q=80',
   },
   {
-    id: 'pura 80 ultra',
-    name: 'Pura 80 ultra',
+    id: 'pura-80-ultra',
+    name: 'Pura 80 Ultra',
     group: 3,
     price: 1300000,
     dailyIncome: 500000,
     duration: 210,
-    phone: 'huawei pura 80 ultra',
+    phone: 'Huawei Pura 80 Ultra',
     image: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?w=400&q=80',
   },
   {
-    id: 'mate XT ultimate',
+    id: 'mate-xt-ultimate',
     name: 'Mate XT Ultimate',
     group: 3,
     price: 2000000,
     dailyIncome: 700000,
     duration: 210,
-    phone: 'Samsung huawei Mate XT Ultimate',
+    phone: 'Huawei Mate XT Ultimate',
     image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&q=80',
   },
 ];
 
-export const MTN_NUMBER = '0756406186';
-export const MTN_NAME = 'Nabakooza Milly';
-export const AIRTEL_NUMBER = '0756406186';
-export const AIRTEL_NAME = 'Nabakooza Milly';
+// ─── RECHARGE - NEW WAY (PesaJet Prompt) ─────────────────────────────
+// NO MTN_NUMBER / AIRTEL_NUMBER for payment anymore.
+// User does NOT send money to any number.
+// Admin collects from user via PesaJet app.
+export const RECHARGE_METHOD = 'pesajet_prompt';
+export const RECHARGE_NOTE = 'Admin will send you a payment prompt. Enter your PIN to complete.';
+export const RECHARGE_MIN = 25000;
+
+// Admin contact only - for Help, NOT for payment
+export const ADMIN_CONTACT_NAME = 'Nabakooza Milly';
+export const ADMIN_CONTACT_PHONE = '0756406186';
+
+// ⚠️ DEPRECATED - Kept only so old imports don't crash. DO NOT USE FOR PAYMENT.
+// If any file still shows "Send to MTN_NUMBER", delete that code.
+export const MTN_NUMBER = '';
+export const MTN_NAME = '';
+export const AIRTEL_NUMBER = '';
+export const AIRTEL_NAME = '';
 
 export const REGISTRATION_BONUS = 9000;
 export const MIN_DEPOSIT = 25000;
